@@ -74,3 +74,28 @@ get '/loginfailure' do
   session.clear
   erb :loginfailure
 end
+
+get '/contents' do
+  @u = session[:username]
+
+  if @u == nil
+    redirect '/badrequest'
+  end
+
+  a = BBSdata.all
+  if a.count == 0
+  @t = "<tr><td>No entries in this BBS.</td></tr>"
+  else
+  @t = ""
+  a.each do |b|
+  @t = @t + "<tr>"
+  @t += "<td>#{b.id}</td>"
+  @t += "<td>#{b.userid}</td>"
+  @t += "<td>#{Time.at(b.writedate)}</td>"
+  @t += "</tr>"
+  @t += "<td><td colspan=\"3\">#{b.entry}</tb></td>\n"
+  end
+  end
+
+  erb :contents
+end
