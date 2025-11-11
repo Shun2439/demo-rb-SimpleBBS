@@ -13,3 +13,15 @@ sqlite3 bbs.db < dbinit.sq3
 ```shell
 bundle exec ruby simplebbs.rb
 ```
+
+## misc
+
+https://github.com/NixOS/templates/tree/master/ruby
+
+```shell
+nix flake init -t templates#ruby
+```
+
+```shell
+nix-shell
+```

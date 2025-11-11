@@ -84,18 +84,55 @@ get '/contents' do
 
   a = BBSdata.all
   if a.count == 0
-  @t = "<tr><td>No entries in this BBS.</td></tr>"
+    @t = "<tr><td>No entries in this BBS.</td></tr>"
   else
-  @t = ""
-  a.each do |b|
-  @t = @t + "<tr>"
-  @t += "<td>#{b.id}</td>"
-  @t += "<td>#{b.userid}</td>"
-  @t += "<td>#{Time.at(b.writedate)}</td>"
-  @t += "</tr>"
-  @t += "<td><td colspan=\"3\">#{b.entry}</tb></td>\n"
-  end
+    @t = ""
+    a.each do |b|
+      @t = @t + "<tr>"
+      @t += "<td>#{b.id}</td>"
+      @t += "<td>#{b.userid}</td>"
+      @t += "<td>#{Time.at(b.writedate)}</td>"
+      if b.userid == @u
+        @t += "<td><form action=\"/delete\" method=\"post\">"
+        @t += "<input type=\"hidden\" name=\"id\" value=\"#{b.id}\">"
+        @t += "<input type=\"hidden\" name=\"_method\" value=\"delete\">"
+        @t += "<input type=\"submit\" value=\"Delete\">"
+        @t += "</form></td>"
+      else
+        @t += "<td></td>"
+      end
+      @t += "</tr>"
+      @t += "<td><td colspan=\"3\">#{b.entry}</tb></td>\n"
+    end
   end
 
   erb :contents
+end
+
+# pp. 179
+
+post '/new' do
+  maxid = 0
+  a = BBSdata.all
+  a.each do |b|
+    if b.id > maxid
+      maxid = b.id
+    end
+  end
+
+  s = BBSdata.new
+  s.id = maxid + 1
+  s.userid = session[:username]
+  s.entry = params[:entry]
+  s.writedate = Time.now.to_i
+  s.save
+
+  redirect '/contents'
+end
+
+delete '/delete' do
+  s = BBSdata.find(params[:id])
+  s.destroy
+
+  redirect '/contents'
 end

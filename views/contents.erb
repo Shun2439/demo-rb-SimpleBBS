@@ -4,3 +4,8 @@ Hello, <%= @user %> (<a href="/logout">Logout</a>)
 <table>
 <%= @t %>
 </table>
+
+<form method="post" action="/new">
+<input type="text" name="entry" size="50" maxlength="100"><br>
+<input type="submit" value="Go">
+</form>
