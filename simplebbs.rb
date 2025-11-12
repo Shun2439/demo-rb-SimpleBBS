@@ -123,7 +123,7 @@ post '/new' do
   s = BBSdata.new
   s.id = maxid + 1
   s.userid = session[:username]
-  s.entry = params[:entry]
+  s.entry = CGI.escapeHTML(params[:entry])
   s.writedate = Time.now.to_i
   s.save
 
