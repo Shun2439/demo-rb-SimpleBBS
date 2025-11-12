@@ -7,5 +7,23 @@ Hello, <%= @user %> (<a href="/logout">Logout</a>)
 
 <form method="post" action="/new">
 <input type="text" name="entry" size="50" maxlength="100"><br>
+<input type="hidden" name="page" value="<%= @page %>">
 <input type="submit" value="Go">
 </form>
+
+<p>
+<% if @total_pages > 1 %>
+  <% if @page > 1 %>
+    <a href="/contents?page=<%= @page - 1 %>">&lt; Previous</a>
+  <% end %>
+  <% (1..@total_pages).each do |i| %>
+    <% if i == @page %>
+      <%= i %>
+    <% else %>
+      <a href="/contents?page=<%= i %>"><%= i %></a>
+    <% end %>
+  <% end %>
+  <% if @page < @total_pages %>
+    <a href="/contents?page=<%= @page + 1 %>">Next &gt;</a>
+  <% end %>
+<% end %>

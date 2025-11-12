@@ -13,6 +13,8 @@ set :sessions,
 ActiveRecord::Base.configurations = YAML.load_file('database.yml')
 ActiveRecord::Base.establish_connection :development
 
+ENTRIES_PER_PAGE = 10
+
 # Represents a record in the 'bbsdata' table.
 class BBSdata < ActiveRecord::Base
   self.table_name = 'bbsdata'
@@ -82,13 +84,21 @@ get '/contents' do
     redirect '/badrequest'
   end
 
-  a = BBSdata.all
+  # Pagination logic
+  @page = params[:page] ? params[:page].to_i : 1
+  offset = (@page - 1) * ENTRIES_PER_PAGE
+
+  total_entries = BBSdata.count
+  @total_pages = (total_entries.to_f / ENTRIES_PER_PAGE).ceil
+
+  a = BBSdata.order(writedate: :asc).limit(ENTRIES_PER_PAGE).offset(offset)
+
   if a.count == 0
     @t = "<tr><td>No entries in this BBS.</td></tr>"
   else
     @t = ""
-    a.each do |b|
-      @t = @t + "<tr>"
+    a.each do |b|\
+      @t += "<tr>"
       @t += "<td>#{b.id}</td>"
       @t += "<td>#{b.userid}</td>"
       @t += "<td>#{Time.at(b.writedate)}</td>"
@@ -102,7 +112,7 @@ get '/contents' do
         @t += "<td></td>"
       end
       @t += "</tr>"
-      @t += "<td><td colspan=\"3\">#{b.entry}</tb></td>\n"
+      @t += "<td><td colspan=\"3\">#{CGI.escapeHTML(b.entry)}</td></td>\n" # Use CGI.escapeHTML here
     end
   end
 
@@ -127,7 +137,7 @@ post '/new' do
   s.writedate = Time.now.to_i
   s.save
 
-  redirect '/contents'
+  redirect "/contents?page=#{params[:page]}"
 end
 
 delete '/delete' do
